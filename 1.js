@@ -14,7 +14,8 @@ function trySelect() {
 		if (there.kyl > 0) {
 			var url = "/b/xk/xs/add/" + there.KCH + "/" + there.KXH;
 			MyApp.post(url, function(data) {
-				console.log(data.msg)
+// 				console.log(data.msg)
+				alert(data.msg)
 			});
 		} else {
 			console.log(there.KCM + "课程号：" + there.KCH + "课序号：" + there.KXH + "  抱歉无课\n")
