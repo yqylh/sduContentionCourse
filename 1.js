@@ -1,5 +1,5 @@
-var kch = ['sd07517110', 'sd07510180'];
-var kxh = ['600', '600'];
+var kch = [];
+var kxh = [];
 var kcpage = [];
 var kcpagerank = [];
 var pagenum = 0;
@@ -38,8 +38,8 @@ function getwz() {
 		if (data.object.currentPage == data.object.totalPages) {
             clearInterval(firstDo);
             console.log('读取完毕');
-            secondDo = setInterval(trySelect, 100)
+            secondDo = setInterval(trySelect, 300)
         }
 	})
 }
-firstDo = setInterval(getwz, 100)
+firstDo = setInterval(getwz, 300)
