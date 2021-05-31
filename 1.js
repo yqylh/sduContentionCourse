@@ -104,6 +104,6 @@ let main = async function() {
         for (let i = 0; i < kchid.length; i++) {
             xsxkOper(kchid[i],kxhid[i])
         }
-    }, 1000);
+    }, 500);
 }
 main();
