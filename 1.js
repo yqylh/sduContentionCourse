@@ -1,10 +1,11 @@
 // 在选课页面F12-console 复制粘贴运行
-// 仅支持必修课 选修课内能查询到的课 , 辅修和重修请自行选课
+// 支持必修课 选修课 限选课内能查询到的课 , 辅修和重修不存在课余量限制请自行选课
 // 请按照下面两行的格式填入课程号和课序号
-let kch = ["SQ0000459H", "SQ0000411H"];
-let kxh = ["400", "400"];
+let kch = ["sd01332200" , "sd00812930" , "sd07517850"];
+let kxh = ["100" , "900" , "600"];
 let kchid = [];
 let kxhid = [];
+let kctype = [];
 let reqData = [
     { "name": "sEcho", "value": "1" },
     { "name": "iColumns", "value": "1" },
@@ -27,7 +28,8 @@ let reqData = [
     { "name": "mDataProp_13", "value": "szkcflmc" },
     { "name": "mDataProp_14", "value": "czOper"}
 ];
-var RXdata, BXdata, AllData;
+var RXdata, BXdata, AllData , XXdata;
+// 加载任选
 let searchRX = ()=>{
     return new Promise((resolve, reject)=>{
         $.ajax({
@@ -41,6 +43,7 @@ let searchRX = ()=>{
         });
     });
 }
+// 加载必修
 let searchBX = ()=>{
     return new Promise((resolve, reject)=>{
         $.ajax({
@@ -54,18 +57,65 @@ let searchBX = ()=>{
         });
     });
 }
-function xsxkOper(kchid,kxhid){
+// 加载限选
+let searchXX = () =>{
+    return new Promise((resolve, reject)=>{
+        $.ajax({
+            type:"post",
+            url:"/jsxsd/xsxkkc/xsxkXxxk?1=1&kcxx=&skls=&skfs=",
+            data:reqData,
+            success:function(resp){ 
+                XXdata = $.parseJSON(resp);
+                resolve();
+            }
+        });
+    });
+}
+// 选修选课
+function xsxkOper(_kchid,_kxhid){
     return new Promise((resolve,reject)=>{
-        var param = "?kcid="+kxhid+"&cfbs=null";
+        let bac = String(_kchid);
+        var param = "?kcid="+_kxhid+"&cfbs=null";
         $.ajax({
             url:"/jsxsd/xsxkkc/ggxxkxkOper"+param,
             data:{
-                jx0404id:kchid,
+                jx0404id:_kchid,
                 xkzy:"",
                 trjf:""
             },
-            success:function(resp){ 
-                console.log(resp);
+            success:function(resp){
+                resp = JSON.parse(resp);
+                console.log(bac , resp);
+                if (resp.success == true) {
+                    kxhid.splice(kchid.indexOf(bac) , 1);
+                    kctype.splice(kchid.indexOf(bac) , 1);
+                    kchid.splice(kchid.indexOf(bac) , 1);
+                }
+                resolve();
+            }
+        })
+    })
+}
+// 必修和限选选课
+function xxxkOper(_kchid,_kxhid){
+    return new Promise((resolve,reject)=>{
+        let bac = String(_kchid);
+        var param = "?kcid="+_kxhid+"&cfbs=null";
+        $.ajax({
+            url:"/jsxsd/xsxkkc/xxxkOper"+param,
+            data:{
+                jx0404id:_kchid,
+                xkzy:"",
+                trjf:""
+            },
+            success:function(resp){
+                resp = JSON.parse(resp);
+                console.log(bac , resp);
+                if (resp.success == true) {
+                    kxhid.splice(kchid.indexOf(bac) , 1);
+                    kctype.splice(kchid.indexOf(bac) , 1);
+                    kchid.splice(kchid.indexOf(bac) , 1);
+                }
                 resolve();
             }
         })
@@ -86,23 +136,44 @@ let main = async function() {
     reqData[1].value = allNum;
     reqData[4].value = allNum;
     await searchBX();
+
+    //
+    reqData[1].value = 1;
+    reqData[4].value = 1;
+    //
+    await searchXX();
+    allNum = XXdata.iTotalRecords;
+    reqData[1].value = allNum;
+    reqData[4].value = allNum;
+    await searchXX();
+
     for (let i = 0; i < kch.length; i++) {
         for (let j of BXdata.aaData) {
             if (j.kch == kch[i] && j.kxh == kxh[i]) {
                 kchid.push(j.jx0404id);
                 kxhid.push(j.jx02id);
+                kctype.push(0);
             }
         }
         for (let j of RXdata.aaData) {
             if (j.kch == kch[i] && j.kxh == kxh[i]) {
                 kchid.push(j.jx0404id);
                 kxhid.push(j.jx02id);
+                kctype.push(1);
+            }
+        }
+        for (let j of XXdata.aaData) {
+            if (j.kch == kch[i] && j.kxh == kxh[i]) {
+                kchid.push(j.jx0404id);
+                kxhid.push(j.jx02id);
+                kctype.push(2);
             }
         }
     }
     setInterval(() =>{
         for (let i = 0; i < kchid.length; i++) {
-            xsxkOper(kchid[i],kxhid[i])
+            if (kctype[i] == 1) xsxkOper(kchid[i],kxhid[i]);
+            else xxxkOper(kchid[i],kxhid[i]);
         }
     }, 500);
 }
