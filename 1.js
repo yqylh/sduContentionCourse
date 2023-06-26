@@ -85,7 +85,7 @@ function xsxkOper(_kchid,_kxhid){
             },
             success:function(resp){
                 resp = JSON.parse(resp);
-                console.log(bac , resp);
+                console.log(resp.message);
                 if (resp.success == true) {
                     kxhid.splice(kchid.indexOf(bac) , 1);
                     kctype.splice(kchid.indexOf(bac) , 1);
@@ -110,7 +110,7 @@ function xxxkOper(_kchid,_kxhid){
             },
             success:function(resp){
                 resp = JSON.parse(resp);
-                console.log(bac , resp);
+                console.log(resp.message);
                 if (resp.success == true) {
                     kxhid.splice(kchid.indexOf(bac) , 1);
                     kctype.splice(kchid.indexOf(bac) , 1);
